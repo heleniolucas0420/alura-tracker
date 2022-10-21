@@ -21,6 +21,7 @@ import { useStore } from 'vuex';
 import { key } from '@/store';
 import { TIPOS_MUTACOES } from '@/store/tipos-mutacoes';
 import { TIPOS_NOTIFICACAO } from '@/interfaces/INotificacao';
+import useNotificador from '@/hooks/notificador';
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -58,11 +59,11 @@ export default defineComponent({
         );
       }
 
-      this.store.commit(TIPOS_MUTACOES.NOTIFICAR, {
-        titulo: 'Novo projecto adicionado',
-        texto: 'Prontinho :) O seu projecto já está disponível para uso',
-        tipo: TIPOS_NOTIFICACAO.SUCESSO,
-      });
+      this.notificar(
+        TIPOS_NOTIFICACAO.SUCESSO,
+        'Novo projecto adicionado',
+        'Prontinho :) O seu projecto já está disponível para uso'
+      );
 
       this.nomeDoProjecto = '';
       this.$router.push('/projetos');
@@ -70,8 +71,10 @@ export default defineComponent({
   },
   setup() {
     const store = useStore(key);
+    const { notificar } = useNotificador();
     return {
       store,
+      notificar,
     };
   },
 });
