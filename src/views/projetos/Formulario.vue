@@ -20,6 +20,7 @@ import { defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import { key } from '@/store';
 import { TIPOS_MUTACOES } from '@/store/tipos-mutacoes';
+import { TIPOS_NOTIFICACAO } from '@/interfaces/INotificacao';
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -51,8 +52,18 @@ export default defineComponent({
           nome: this.nomeDoProjecto,
         });
       } else {
-        this.store.commit(TIPOS_MUTACOES.ADICIONAR_PROJETO, this.nomeDoProjecto);
+        this.store.commit(
+          TIPOS_MUTACOES.ADICIONAR_PROJETO,
+          this.nomeDoProjecto
+        );
       }
+
+      this.store.commit(TIPOS_MUTACOES.NOTIFICAR, {
+        titulo: 'Novo projecto adicionado',
+        texto: 'Prontinho :) O seu projecto já está disponível para uso',
+        tipo: TIPOS_NOTIFICACAO.SUCESSO,
+      });
+
       this.nomeDoProjecto = '';
       this.$router.push('/projetos');
     },

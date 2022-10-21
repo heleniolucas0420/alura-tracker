@@ -16,6 +16,7 @@ import ITarefa from '../interfaces/ITarefa';
 import { useStore } from 'vuex';
 import { key } from '@/store';
 import { TIPOS_MUTACOES } from '@/store/tipos-mutacoes';
+import { TIPOS_NOTIFICACAO } from '@/interfaces/INotificacao';
 
 export default defineComponent({
   name: 'TarefasView',
@@ -31,7 +32,22 @@ export default defineComponent({
   },
   methods: {
     salvarTarefa(tarefa: ITarefa) {
+      if (!tarefa.projeto) {
+        this.store.commit(TIPOS_MUTACOES.NOTIFICAR, {
+          titulo: 'Erro ao adicionar tarefa',
+          texto:
+            'Ups :( Erro ao adicionar uma nova tarefa. Selecione um projeto',
+          tipo: TIPOS_NOTIFICACAO.FALHA,
+          intervalo: 7000,
+        });
+        return;
+      }
       this.store.commit(TIPOS_MUTACOES.ADICIONAR_TAREFA, tarefa);
+      this.store.commit(TIPOS_MUTACOES.NOTIFICAR, {
+        titulo: 'Tarefa adicionada com sucesso',
+        texto: 'Boa :) Você completou mais uma tarefa!',
+        tipo: TIPOS_NOTIFICACAO.SUCESSO,
+      });
     },
   },
   setup() {
@@ -39,7 +55,7 @@ export default defineComponent({
     return {
       store,
       tarefas: computed(() => store.state.tarefas),
-    }
-  }
+    };
+  },
 });
 </script>

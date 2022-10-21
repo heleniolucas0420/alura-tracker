@@ -3,10 +3,12 @@ import { createStore, Store } from 'vuex';
 import IProjeto from '@/interfaces/IProjeto';
 import ITarefa from '@/interfaces/ITarefa';
 import { TIPOS_MUTACOES } from './tipos-mutacoes';
+import INotificao from '@/interfaces/INotificacao';
 
 interface Estado {
   projetos: IProjeto[];
   tarefas: ITarefa[];
+  notificacoes: INotificao[];
 }
 
 export const key: InjectionKey<Store<Estado>> = Symbol();
@@ -15,6 +17,7 @@ export const store = createStore<Estado>({
   state: {
     projetos: [],
     tarefas: [],
+    notificacoes: [],
   },
   mutations: {
     [TIPOS_MUTACOES.ADICIONAR_PROJETO](state, nomeDoProjeto: string) {
@@ -38,6 +41,17 @@ export const store = createStore<Estado>({
     },
     [TIPOS_MUTACOES.REMOVER_TAREFA](state, id: string) {
       state.tarefas = state.tarefas.filter((tar) => tar.id !== id);
+    },
+    [TIPOS_MUTACOES.NOTIFICAR](state, novaNotificacao: INotificao) {
+      novaNotificacao.id = new Date().getTime();
+      novaNotificacao.intervalo = novaNotificacao.intervalo || 3000
+      state.notificacoes.push(novaNotificacao);
+
+      setTimeout(() => {
+        state.notificacoes = state.notificacoes.filter(
+          (notificacao) => notificacao.id !== novaNotificacao.id
+        );
+      }, novaNotificacao.intervalo);
     },
   },
 });
