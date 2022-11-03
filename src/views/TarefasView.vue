@@ -33,7 +33,6 @@
             id="descricaoDaTarefa"
           />
         </section>
-        <i class="fa-solid fa-shield-halved"></i>
         <footer class="modal-card-foot">
           <button @click="salvarAlteracoes" class="button is-success">Salvar Aterações</button>
           <button @click="fecharModal" class="button">Cancel</button>
@@ -101,7 +100,7 @@ export default defineComponent({
     },
     salvarAlteracoes() {
       this.store.dispatch(TIPOS_ACOES.ALTERAR_TAREFA, this.tarefaSelecionada).then(() => {
-        this.tarefaSelecionada = null;
+        this.fecharModal();
         this.notificar(
           TIPOS_NOTIFICACAO.SUCESSO,
           'Tarefa alterada com sucesso',
