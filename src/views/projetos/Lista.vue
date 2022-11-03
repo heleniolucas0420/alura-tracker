@@ -39,14 +39,14 @@ import { defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import { key } from '@/store';
 import { computed } from '@vue/reactivity';
-import { TIPOS_MUTACOES } from '@/store/tipos-mutacoes';
+import { TIPOS_ACOES } from '@/store/tipo-acoes';
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Lista',
   methods: {
     excluir(id: string) {
-      this.store.commit(TIPOS_MUTACOES.EXCLUIR_PROJETO, id);
+      this.store.dispatch(TIPOS_ACOES.REMOVER_PROJETO, id)
     }
   },
   setup() {

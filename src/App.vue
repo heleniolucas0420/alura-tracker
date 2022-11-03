@@ -15,8 +15,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { useStore } from 'vuex';
 import BarraLateral from './components/BarraLateral.vue';
 import Notificacao from './components/Notificacao.vue';
+import { key } from './store';
+import { TIPOS_ACOES } from './store/tipo-acoes';
 
 export default defineComponent({
   name: 'App',
@@ -34,6 +37,11 @@ export default defineComponent({
       this.modoEscuroAtivo = modoEscuroAtivo;
     },
   },
+  setup() {
+    const store = useStore(key);
+    store.dispatch(TIPOS_ACOES.OBTER_PROJETOS);
+    store.dispatch(TIPOS_ACOES.OBTER_TAREFAS);
+  }
 });
 </script>
 

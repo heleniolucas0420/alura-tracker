@@ -1,6 +1,6 @@
 <template>
   <Box>
-    <div class="columns">
+    <div class="columns clicable" @click="tarefaClicada">
       <div class="column is-5">
         {{ tarefa.descricao || 'Tarefa sem descrição' }}
       </div>
@@ -24,13 +24,14 @@ import { defineComponent, PropType } from 'vue';
 import Cronometro from './Cronometro.vue';
 import Box from './Box.vue';
 import ITarefa from '@/interfaces/ITarefa';
-import { TIPOS_MUTACOES } from '@/store/tipos-mutacoes';
 import { useStore } from 'vuex';
 import { key } from '@/store';
+import { TIPOS_ACOES } from '@/store/tipo-acoes';
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Tarefa',
+  emits: ['aoClicarTarefa'],
   props: {
     tarefa: {
       type: Object as PropType<ITarefa>,
@@ -43,7 +44,10 @@ export default defineComponent({
   },
   methods: {
     remover(id: string) {
-      this.store.commit(TIPOS_MUTACOES.REMOVER_TAREFA, id);
+      this.store.dispatch(TIPOS_ACOES.REMOVER_TAREFA, id);
+    },
+    tarefaClicada(): void {
+      this.$emit('aoClicarTarefa', this.tarefa);
     },
   },
   setup() {
@@ -54,3 +58,9 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.clicable {
+  cursor: pointer;
+}
+</style>

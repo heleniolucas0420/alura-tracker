@@ -17,12 +17,13 @@ export default (): Notificador => {
     titulo: string,
     texto: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interval?: number
+    intervalo?: number
   ) => {
     store.commit(TIPOS_MUTACOES.NOTIFICAR, {
       titulo,
       texto,
       tipo,
+      intervalo
     });
   };
 

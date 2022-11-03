@@ -22,6 +22,7 @@ import { key } from '@/store';
 import { TIPOS_MUTACOES } from '@/store/tipos-mutacoes';
 import { TIPOS_NOTIFICACAO } from '@/interfaces/INotificacao';
 import useNotificador from '@/hooks/notificador';
+import { TIPOS_ACOES } from '@/store/tipo-acoes';
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -30,6 +31,11 @@ export default defineComponent({
     id: {
       type: String,
     },
+  },
+  data() {
+    return {
+      nomeDoProjecto: '',
+    };
   },
   mounted() {
     if (this.id) {
@@ -40,33 +46,34 @@ export default defineComponent({
       this.nomeDoProjecto = projeto?.nome || '';
     }
   },
-  data() {
-    return {
-      nomeDoProjecto: '',
-    };
-  },
   methods: {
     salvar() {
       if (this.id) {
-        this.store.commit(TIPOS_MUTACOES.ALTERAR_PROJETO, {
+        this.store.dispatch(TIPOS_ACOES.ALTERAR_PROJETO, {
           id: this.id,
           nome: this.nomeDoProjecto,
-        });
+        }).then(({data}) => {
+          this.store.commit(TIPOS_MUTACOES.ALTERAR_PROJETO, data);
+          this.nomeDoProjecto = '';
+          this.$router.push('/projetos');
+        })
       } else {
-        this.store.commit(
-          TIPOS_MUTACOES.ADICIONAR_PROJETO,
+        this.store.dispatch(
+          TIPOS_ACOES.CADASTRAR_PROJETO,
           this.nomeDoProjecto
-        );
+        ).then(({ data }) => {
+          this.store.commit(TIPOS_MUTACOES.ADICIONAR_PROJETO, data);
+          this.notificar(
+            TIPOS_NOTIFICACAO.SUCESSO,
+            'Novo projecto adicionado',
+            'Prontinho :) O seu projecto já está disponível para uso'
+          );
+          this.nomeDoProjecto = '';
+          this.$router.push('/projetos');
+        })
       }
 
-      this.notificar(
-        TIPOS_NOTIFICACAO.SUCESSO,
-        'Novo projecto adicionado',
-        'Prontinho :) O seu projecto já está disponível para uso'
-      );
 
-      this.nomeDoProjecto = '';
-      this.$router.push('/projetos');
     },
   },
   setup() {
