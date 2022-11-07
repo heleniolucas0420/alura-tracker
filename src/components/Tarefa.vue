@@ -4,13 +4,13 @@
       <div class="column is-5">
         {{ tarefa.descricao || 'Tarefa sem descrição' }}
       </div>
-      <div class="column is-3">
+      <div class="column is-4">
         {{ tarefa.projeto?.nome || '' }}
       </div>
       <div class="column">
         <Cronometro :tempo-em-segundos="tarefa.duracaoEmSegundos" />
       </div>
-      <button class="button ml-2 is-danger mr-2" @click="remover(tarefa.id)">
+      <button class="button is-danger mr-2 my-2 " @click="remover(tarefa.id)">
         <span class="icon is-small">
           <i class="fas fa-trash"></i>
         </span>
@@ -42,18 +42,21 @@ export default defineComponent({
     Cronometro,
     Box,
   },
-  methods: {
-    remover(id: string) {
-      this.store.dispatch(TIPOS_ACOES.REMOVER_TAREFA, id);
-    },
-    tarefaClicada(): void {
-      this.$emit('aoClicarTarefa', this.tarefa);
-    },
-  },
-  setup() {
+  setup(props, { emit }) {
     const store = useStore(key);
+
+    const remover = (id: string) => {
+      store.dispatch(TIPOS_ACOES.REMOVER_TAREFA, id);
+    };
+
+    const tarefaClicada = (): void => {
+      emit('aoClicarTarefa', props.tarefa);
+    };
+
     return {
       store,
+      remover,
+      tarefaClicada
     };
   },
 });

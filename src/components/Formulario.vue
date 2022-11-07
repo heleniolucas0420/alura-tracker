@@ -19,8 +19,8 @@
           <select v-model="idProjeto">
             <option value="">Selecione o projeto</option>
             <option
-              :value="projeto.id"
               v-for="projeto in projetos"
+              :value="projeto.id"
               :key="projeto.id"
             >
               {{ projeto.nome }}
@@ -36,40 +36,39 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref, computed} from 'vue';
 import Temporizador from './Temporizador.vue';
 import ITarefa from '@/interfaces/ITarefa';
 import { useStore } from 'vuex';
 import { key } from '@/store';
-import { computed } from '@vue/reactivity';
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Formulario',
   emits: ['aoSalvarTarefa'],
-  data() {
-    return {
-      descricao: '',
-      idProjeto: '',
-    };
-  },
   components: {
     Temporizador,
   },
-  methods: {
-    finalizar(tempoDecorrido: number): void {
-      this.$emit('aoSalvarTarefa', {
-        duracaoEmSegundos: tempoDecorrido,
-        descricao: this.descricao,
-        projeto: this.projetos.find((project) => project.id === this.idProjeto),
-      } as ITarefa);
-      this.descricao = '';
-    },
-  },
-  setup() {
+  setup(props, { emit }) {
     const store = useStore(key);
+    const projetos = computed(() => store.state.projeto.projetos);
+    const descricao = ref('');
+    const idProjeto = ref('');
+
+    const finalizar = (tempoDecorrido: number): void => {
+      emit('aoSalvarTarefa', {
+        duracaoEmSegundos: tempoDecorrido,
+        descricao: descricao.value,
+        projeto: projetos.value.find((project) => project.id === idProjeto.value),
+      } as ITarefa);
+      descricao.value = '';
+    };
+
     return {
-      projetos: computed(() => store.state.projetos),
+      projetos,
+      descricao,
+      idProjeto,
+      finalizar,
     };
   },
 });

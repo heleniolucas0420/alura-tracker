@@ -5,8 +5,8 @@
       <input
         type="text"
         class="input"
-        v-model="nomeDoProjecto"
         id="nomeDoProjecto"
+        v-model="nomeDoProjeto"
       />
     </div>
     <div class="field">
@@ -16,13 +16,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useStore } from 'vuex';
 import { key } from '@/store';
 import { TIPOS_MUTACOES } from '@/store/tipos-mutacoes';
 import { TIPOS_NOTIFICACAO } from '@/interfaces/INotificacao';
 import useNotificador from '@/hooks/notificador';
 import { TIPOS_ACOES } from '@/store/tipo-acoes';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   // eslint-disable-next-line vue/multi-word-component-names
@@ -32,56 +33,49 @@ export default defineComponent({
       type: String,
     },
   },
-  data() {
-    return {
-      nomeDoProjecto: '',
-    };
-  },
-  mounted() {
-    if (this.id) {
-      const projeto = this.store.state.projetos.find(
-        (projecto) => projecto.id === this.id
-      );
-
-      this.nomeDoProjecto = projeto?.nome || '';
-    }
-  },
-  methods: {
-    salvar() {
-      if (this.id) {
-        this.store.dispatch(TIPOS_ACOES.ALTERAR_PROJETO, {
-          id: this.id,
-          nome: this.nomeDoProjecto,
-        }).then(({data}) => {
-          this.store.commit(TIPOS_MUTACOES.ALTERAR_PROJETO, data);
-          this.nomeDoProjecto = '';
-          this.$router.push('/projetos');
-        })
-      } else {
-        this.store.dispatch(
-          TIPOS_ACOES.CADASTRAR_PROJETO,
-          this.nomeDoProjecto
-        ).then(({ data }) => {
-          this.store.commit(TIPOS_MUTACOES.ADICIONAR_PROJETO, data);
-          this.notificar(
-            TIPOS_NOTIFICACAO.SUCESSO,
-            'Novo projecto adicionado',
-            'Prontinho :) O seu projecto já está disponível para uso'
-          );
-          this.nomeDoProjecto = '';
-          this.$router.push('/projetos');
-        })
-      }
-
-
-    },
-  },
-  setup() {
+  setup(props) {
     const store = useStore(key);
     const { notificar } = useNotificador();
+    const nomeDoProjeto = ref('');
+    const router = useRouter();
+
+    if (props.id) {
+      const { projetos } = store.state.projeto;
+      const projeto = projetos.find((projecto) => projecto.id === props.id);
+      nomeDoProjeto.value = projeto?.nome || '';
+    }
+
+    const salvar = () => {
+      if (props.id) {
+        store
+          .dispatch(TIPOS_ACOES.ALTERAR_PROJETO, {
+            id:props.id,
+            nome: nomeDoProjeto.value,
+          })
+          .then(({ data }) => {
+            store.commit(TIPOS_MUTACOES.ALTERAR_PROJETO, data);
+            nomeDoProjeto.value = '';
+            router.push('/projetos');
+          });
+      } else {
+        store
+          .dispatch(TIPOS_ACOES.CADASTRAR_PROJETO, nomeDoProjeto)
+          .then(({ data }) => {
+            store.commit(TIPOS_MUTACOES.ADICIONAR_PROJETO, data);
+            notificar(
+              TIPOS_NOTIFICACAO.SUCESSO,
+              'Novo projecto adicionado',
+              'Prontinho :) O seu projecto já está disponível para uso'
+            );
+            nomeDoProjeto.value = '';
+            router.push('/projetos');
+          });
+      }
+    }
+
     return {
-      store,
-      notificar,
+      nomeDoProjeto,
+      salvar
     };
   },
 });

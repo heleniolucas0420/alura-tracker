@@ -7,26 +7,34 @@
     {
       "id": "2022-10-25T09:14:31.070Z",
       "nome": "Novo projeto"
+    },
+    {
+      "id": "2022-11-03T10:43:58.036Z",
+      "nome": "estudos particulares parte 1"
+    },
+    {
+      "id": "2022-11-03T12:48:47.835Z",
+      "nome": "estudos particulares parte 2"
     }
   ],
   "tarefas": [
     {
-      "duracaoEmSegundos": 3,
-      "descricao": "Nova tarefa 2.1",
-      "projeto": {
-        "id": "2022-10-25T09:14:31.070Z",
-        "nome": "Novo projeto"
-      },
-      "id": "2022-10-25T10:04:02.552Z"
-    },
-    {
-      "duracaoEmSegundos": 3,
-      "descricao": "outra tarefa saiu de teste",
+      "duracaoEmSegundos": 7,
+      "descricao": "esturdar nuxt parte 1",
       "projeto": {
         "id": "2022-10-25T08:47:27.431Z",
         "nome": "Vue Js com typescript 2.1"
       },
-      "id": "2022-11-02T12:44:50.634Z"
+      "id": "2022-11-04T08:45:03.050Z"
+    },
+    {
+      "duracaoEmSegundos": 3,
+      "descricao": "estudar nuxt parte 2",
+      "projeto": {
+        "id": "2022-10-25T08:47:27.431Z",
+        "nome": "Vue Js com typescript 2.1"
+      },
+      "id": "2022-11-04T08:45:22.117Z"
     }
   ],
   "profile": {

@@ -2,51 +2,62 @@
   <Formulario @ao-salvar-tarefa="salvarTarefa" />
   <!-- Lista de Tarefas -->
   <div class="lista">
+    <Box v-if="listaEstaVazia && !filtro">
+      Você não está muito produtivo hoje :(
+    </Box>
+    <div class="field" v-if="!listaEstaVazia || filtro">
+      <p class="control has-icons-left has-icons-right">
+        <input
+          class="input"
+          type="text"
+          placeholder="Pesquise uma tarefa"
+          v-model="filtro"
+        />
+        <span class="icon is-small is-left">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </span>
+      </p>
+    </div>
     <Tarefa
       v-for="(tarefa, index) in tarefas"
       :key="index"
       :tarefa="tarefa"
       @ao-clicar-tarefa="selecionarTarefa"
     />
-    <Box v-if="listaEstaVazia"> Você não está muito produtivo hoje :( </Box>
-    <div
-      class="modal"
-      :class="{ 'is-active': tarefaSelecionada }"
-      v-if="tarefaSelecionada"
-    >
-      <div class="modal-background"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Editando uma tarefa</p>
-          <button
-            @click="fecharModal"
-            class="delete"
-            aria-label="close"
-          ></button>
-        </header>
-        <section class="modal-card-body">
-          <label for="descricaoDaTarefa" class="label">Descrição</label>
-          <input
-            type="text"
-            class="input"
-            v-model="tarefaSelecionada.descricao"
-            id="descricaoDaTarefa"
-          />
-        </section>
-        <footer class="modal-card-foot">
-          <button @click="salvarAlteracoes" class="button is-success">Salvar Aterações</button>
-          <button @click="fecharModal" class="button">Cancel</button>
-        </footer>
-      </div>
-    </div>
+    <Modal :mostrar="tarefaSelecionada !== null">
+      <template #cabecalho>
+        <p class="modal-card-title">Editando uma tarefa</p>
+        <buttton
+          @click="fecharModal"
+          class="delete"
+          aria-label="close"
+        ></buttton>
+      </template>
+      <template #corpo>
+        <label for="descricaoDaTarefa" class="label">Descrição</label>
+        <input
+          type="text"
+          class="input"
+          v-model="tarefaSelecionada.descricao"
+          id="descricaoDaTarefa"
+        />
+      </template>
+      <template #rodape>
+        <button @click="salvarAlteracoes" class="button is-success">
+          Salvar Aterações
+        </button>
+        <button @click="fecharModal" class="button">Cancel</button>
+      </template>
+    </Modal>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref, watchEffect } from 'vue';
 import Formulario from '../components/Formulario.vue';
 import Tarefa from '../components/Tarefa.vue';
 import Box from '../components/Box.vue';
+import Modal from '@/components/Modal.vue';
 import ITarefa from '../interfaces/ITarefa';
 import { useStore } from 'vuex';
 import { key } from '@/store';
@@ -60,6 +71,7 @@ export default defineComponent({
     Formulario,
     Tarefa,
     Box,
+    Modal,
   },
   computed: {
     listaEstaVazia(): boolean {
@@ -99,23 +111,39 @@ export default defineComponent({
       this.tarefaSelecionada = null;
     },
     salvarAlteracoes() {
-      this.store.dispatch(TIPOS_ACOES.ALTERAR_TAREFA, this.tarefaSelecionada).then(() => {
-        this.fecharModal();
-        this.notificar(
-          TIPOS_NOTIFICACAO.SUCESSO,
-          'Tarefa alterada com sucesso',
-          'Falhou o nome é? mais cuidado da próxima vez ;)'
-        );
-      })
-    }
+      this.store
+        .dispatch(TIPOS_ACOES.ALTERAR_TAREFA, this.tarefaSelecionada)
+        .then(() => {
+          this.fecharModal();
+          this.notificar(
+            TIPOS_NOTIFICACAO.SUCESSO,
+            'Tarefa alterada com sucesso',
+            'Falhou o nome é? mais cuidado da próxima vez ;)'
+          );
+        });
+    },
   },
   setup() {
     const store = useStore(key);
+    const { tarefa } = store.state;
     const { notificar } = useNotificador();
+    const filtro = ref('');
+
+    // const tarefas = computed(() =>
+    //   tarefa.tarefas.filter(
+    //     (tar) => !filtro.value || tar.descricao.toLocaleLowerCase().includes(filtro.value)
+    //   )
+    // );
+
+    watchEffect(() => {
+      store.dispatch(TIPOS_ACOES.OBTER_TAREFAS, filtro.value);
+    });
+
     return {
       store,
-      tarefas: computed(() => store.state.tarefas),
+      tarefas: computed(() => tarefa.tarefas),
       notificar,
+      filtro,
     };
   },
 });
